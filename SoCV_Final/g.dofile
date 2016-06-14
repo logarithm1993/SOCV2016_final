@@ -1,0 +1,3 @@
+read aig ../testcase/6s210b037.aig
+satv pdr -o 0
+quit -f

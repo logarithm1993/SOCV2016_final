@@ -1,0 +1,6 @@
+read rtl a.v
+blast ntk
+satv pdr -o 0
+# satv pdr -o 1
+# satv pdr -o 2
+q -f
