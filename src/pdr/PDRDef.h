@@ -29,9 +29,9 @@ class Value3
   }
 
   Value3 operator & (Value3 a)const{
-    //cout << (_bit<<3 | _dontCare <<2 | a._bit<<1 | a._dontCare) <<endl;
 #if 1
-    return _lut[(_bit<<3 | _dontCare <<2 | a._bit<<1 | a._dontCare)];
+    //return Value3(_bit&a._bit, (_dontCare&a._bit) | (_bit&a._dontCare) | (_dontCare&a._dontCare));
+    return Value3(_bit&a._bit, (_dontCare&(a._bit|a._dontCare)) | (_bit&a._dontCare));
 #else
     if((_bit == 0 && _dontCare == 0) || a == Value3(0,0) ) return Value3(0,0);
     else if(a._dontCare || _dontCare) return Value3(0,1);
@@ -54,7 +54,7 @@ class Value3
     else return Value3(0, 0);
   }
   Value3 operator ~ ()const{
-#if 0
+#if 1
      return Value3(!_bit,_dontCare);
 #else
     if(_dontCare) {return Value3(0,1);}
@@ -72,7 +72,6 @@ class Value3
   }
   bool _bit;
   bool _dontCare;
-  static Value3*    _lut; // look up table for '&' operator
 };
 
 

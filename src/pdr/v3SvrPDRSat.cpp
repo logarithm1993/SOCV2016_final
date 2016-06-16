@@ -21,10 +21,6 @@
 #include <cmath>
 
 
-// OAO: static members
-
-Value3* Value3::_lut = NULL;
-
 /* -------------------------------------------------- *\
  * Class V3SvrPDRSat Implementations
 \* -------------------------------------------------- */
@@ -646,19 +642,6 @@ void V3SvrPDRSat::initValue3Data(){
    for (unsigned i = 0; i < _ntk->getNetSize(); ++i){
       _Value3List.push_back(Value3(0,1));
    }
-   // OAO: _initialize _lut
-   if( !Value3::_lut ){
-      Value3::_lut = new Value3[16]; // initialize with (0,1)
-      Value3::_lut[0] = Value3::_lut[1]
-                      = Value3::_lut[2]  
-                      = Value3::_lut[3]  
-                      = Value3::_lut[4]  
-                      = Value3::_lut[8]  
-                      = Value3::_lut[12]  
-                      = Value3(0,0);
-      Value3::_lut[10]= Value3(1,0);
-   }
-   
 }
 int V3SvrPDRSat::getValue(Var v) const {
   if(_Solver->model[v]==l_True)return 1;
