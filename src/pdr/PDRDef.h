@@ -29,8 +29,7 @@ class Value3
   }
 
   Value3 operator & (Value3 a)const{
-#if 1
-    //return Value3(_bit&a._bit, (_dontCare&a._bit) | (_bit&a._dontCare) | (_dontCare&a._dontCare));
+#if 1 // this improves efficiency
     return Value3(_bit&a._bit, (_dontCare&(a._bit|a._dontCare)) | (_bit&a._dontCare));
 #else
     if((_bit == 0 && _dontCare == 0) || a == Value3(0,0) ) return Value3(0,0);
@@ -54,7 +53,7 @@ class Value3
     else return Value3(0, 0);
   }
   Value3 operator ~ ()const{
-#if 1
+#if 0 // this is useless
      return Value3(!_bit,_dontCare);
 #else
     if(_dontCare) {return Value3(0,1);}

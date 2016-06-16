@@ -503,8 +503,13 @@ void V3SvrPDRSat::v3SimOneGate(V3NetId id){
   if(type == AIG_NODE) {
     Value3 in1 = _Value3List[ (_ntk->getInputNetId(id, 0)).id ] ;
     Value3 in2 = _Value3List[ (_ntk->getInputNetId(id, 1)).id ] ;
+#if 1  // this improves efficiency
+    in1._bit ^= (_ntk->getInputNetId(id, 0)).cp; 
+    in2._bit ^= (_ntk->getInputNetId(id, 1)).cp;
+#else
     if((_ntk->getInputNetId(id, 0)).cp) in1 = ~in1;
     if((_ntk->getInputNetId(id, 1)).cp) in2 = ~in2;
+#endif
     _Value3List[ id.id ] =  in1 & in2;
   }
 }
