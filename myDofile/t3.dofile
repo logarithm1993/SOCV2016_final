@@ -1,0 +1,3 @@
+read  aig ./hwmcc/6s282b01.aig
+satv pdr -o 0
+q -f

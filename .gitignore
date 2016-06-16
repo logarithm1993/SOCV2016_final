@@ -22,6 +22,7 @@
 *.out
 *.app
 bin/*
+*pdrv*
 
 # vim temp files
 *.swp
