@@ -1,12 +1,9 @@
 read rtl tests/Traffic.v
 blast ntk
-satv bmc -o 8
-satv bmc -o 9
-satv bmc -o 10
-satv itp -o 8
+satv pdr -o 8
 usage
-satv itp -o 9
+satv pdr -o 9
 usage
-satv itp -o 10
+satv pdr -o 10
 usage
 quit -f
