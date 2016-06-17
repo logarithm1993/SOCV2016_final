@@ -170,14 +170,17 @@ bool PDRMgr::PDR(const V3NetId& monitor, SatProofRes& pRes){
         }
         // OAO: print cex here < state, input TODO >
         for(int x = vCex.size()-1, s = x; x >=0; --x){
-           cout<<"<time - "<< s-x << "> ";
-           cout<<"input : ";
-           for(uint y = 0; y < Z->_I; ++y){
-              cout<< (vInput[x][y]? "1" : "0");
-           }
-           cout<<"\tstate : "; vCex[x]._cube->show();
+          cout<<"<time - "<< s-x << "> ";
            
-           cout<<endl;
+          cout<<"input : ";
+          for(uint y = 0; y < Z->_I; ++y){
+            if(x)
+              cout<< (vInput[x-1][y]? "1" : "0");
+            else
+              cout<<"-";
+          }
+          cout<<"\tstate : "; vCex[x]._cube->show();
+          cout<<endl;
         }
         return true; // Cex found
       }
