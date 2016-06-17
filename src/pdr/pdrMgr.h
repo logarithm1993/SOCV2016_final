@@ -70,7 +70,7 @@ class PDRMgr {
     void   reset();
 
     bool   PDR(const V3NetId& monitor, SatProofRes& pRes);
-    bool   recursiveBlockCube(TCube s0);
+    bool   recursiveBlockCube(TCube s0, vector<TCube>& vCex, vector<bool*>& vInput);
     bool   isBlocked(TCube s);
     TCube  generalize(TCube s);
     bool   propagateBlockedCubes(SatProofRes& pRes);

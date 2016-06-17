@@ -138,19 +138,27 @@ bool PDRMgr::PDR(const V3NetId& monitor, SatProofRes& pRes){
     }
   }*/
 
+  vector<TCube> vCex;
+  vector<bool*> vInput;
 // PDR Main function
   while(true){
 
     Cube* cube = Z->getBadCube(depth);  // find the BadCube
-                                       // ( check SAT ? (!P & R_k) )
-
+                                        // ( check SAT ? (!P & R_k) )
+    vCex.clear();
+    if(!vInput.empty())
+    {
+       for(uint x = 0, n = vInput.size(); x < n; ++x)
+          delete [] vInput[x];
+       vInput.clear();
+    }
     if(heavy_debug){
       if(cube->_latchValues) { cerr<<"bad cube in frame:" << depth << endl; cube->show();}
       else cerr << "bad cube is NULL\n";
     }
     if (cube->_latchValues != NULL){
       TCube t(cube,depth);
-      if (!recursiveBlockCube(t)) {
+      if (!recursiveBlockCube(t, vCex, vInput)) {
         pRes.setFired(0);
         if(showinfo){
           system("clear");
@@ -160,7 +168,18 @@ bool PDRMgr::PDR(const V3NetId& monitor, SatProofRes& pRes){
           }
           cerr << "Frame INF :" << (*F)[F->size()-1]->size() << endl;
         }
-        return true; // Cex founded
+        // OAO: print cex here < state, input TODO >
+        for(int x = vCex.size()-1, s = x; x >=0; --x){
+           cout<<"<time - "<< s-x << "> ";
+           cout<<"input : ";
+           for(uint y = 0; y < Z->_I; ++y){
+              cout<< (vInput[x][y]? "1" : "0");
+           }
+           cout<<"\tstate : "; vCex[x]._cube->show();
+           
+           cout<<endl;
+        }
+        return true; // Cex found
       }
     }
     else{
@@ -181,11 +200,13 @@ bool PDRMgr::PDR(const V3NetId& monitor, SatProofRes& pRes){
   }
 }
 
-bool PDRMgr::recursiveBlockCube(TCube s0){
+bool PDRMgr::recursiveBlockCube(TCube s0, vector<TCube>& vCex, vector<bool*>& vInput){
   if(soft_debug) cerr << "\n\n'''recursiveBlockCube'''\n" << endl;
 
   priority_queue< TCube, vector<TCube>, cmp >  Q;
   Q.push(s0);
+  vCex.push_back(s0);
+  
   if(heavy_debug) {cerr << "pushed : " << s0._cube << ", "; s0._cube->show();}
   while(Q.size() > 0){
     TCube s = Q.top();
@@ -199,7 +220,7 @@ bool PDRMgr::recursiveBlockCube(TCube s0){
       assert(! (Z->isInitial( s._cube ) ));
 
       TCube z = Z->solveRelative(s,1);
-
+      
       if(z._frame != -1){
         // UNSAT, s is blocked
         z = generalize(z);
@@ -227,6 +248,15 @@ bool PDRMgr::recursiveBlockCube(TCube s0){
         if(heavy_debug) {cerr << "pushed : " << z._cube << ", "; z._cube->show();}
         Q.push(s); // put it in queue again
         if(heavy_debug) {cerr << "pushed : " << s._cube << ", "; s._cube->show();}
+        // OAO: record input assign. 
+        bool* cexII = new bool [Z->_I];
+        for (uint i = 0; i < Z->_I; ++i){
+            Var tv = Z->getVerifyData( _ntk->getInput(i), 0);
+            if(tv)
+               cexII[i] = Z->getValue( tv );
+        }
+        vInput.push_back(cexII);
+        vCex.push_back(z);
       }
     }
   }
