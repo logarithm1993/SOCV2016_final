@@ -106,8 +106,11 @@ class V3SvrPDRSat
       void initValue3Data();
       void dfs(V3NetVec& orderedNets);
       void v3SimOneGate(V3NetId id);
+#if 100
+      bool getValue(Var v) const;
+#else
       int getValue(Var v) const;
-
+#endif
       Cube* getBadCube(uint depth);
       bool isBlocked(TCube c);
       bool isInitial(Cube* c);

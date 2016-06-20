@@ -563,8 +563,12 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
       }
       else{
          // check monitor
+         #if 1 //this improves efficiency
+         x_is_found = _Value3List[_monitor.id]._dontCare;
+         #else
          if(_Value3List[_monitor.id]._dontCare == true)
             x_is_found = true;
+         #endif
       }
 
       // undo the removal if needed
@@ -648,12 +652,20 @@ void V3SvrPDRSat::initValue3Data(){
       _Value3List.push_back(Value3(0,1));
    }
 }
+// OAO: int -> bool
+#if 1
+bool V3SvrPDRSat::getValue(Var v) const {
+   return (_Solver->model[v] == l_True);
+}
+#else
 int V3SvrPDRSat::getValue(Var v) const {
   if(_Solver->model[v]==l_True)return 1;
   if(_Solver->model[v]==l_False)return 0;
   assert(0);
   return -1;
 }
+#endif
+
 bool V3SvrPDRSat::isBlocked(TCube c){
   //TCube t = solveRelative(c,c._frame);
   //if(t._frame == -1){return false;}
