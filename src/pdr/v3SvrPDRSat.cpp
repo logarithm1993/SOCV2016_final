@@ -526,9 +526,9 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
    }
    // set initial value for PI and FFs
    for( uint i = 0; i < _I; ++i ){
-      V3NetId PI = _ntk->getInput(i);
-      _Value3List[PI.id]._dontCare = false;
-      _Value3List[PI.id]._bit = input[i];
+      V3NetId pi = _ntk->getInput(i);
+      _Value3List[pi.id]._dontCare = false;
+      _Value3List[pi.id]._bit = input[i];
    }
    for( uint i = 0; i < _L; ++i ){
       V3NetId FF = _ntk->getLatch(i);
@@ -561,12 +561,13 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
       }
       else{
          // check monitor
-         #if 1 //this improves efficiency
+         //#if 1 //this improves efficiency
          x_is_found = _Value3List[_monitor.id]._dontCare;
-         #else
-         if(_Value3List[_monitor.id]._dontCare == true)
-            x_is_found = true;
-         #endif
+        
+         //#else
+         //if(_Value3List[_monitor.id]._dontCare == true)
+         //   x_is_found = true;
+         //#endif
       }
 
       // undo the removal if needed
@@ -580,6 +581,102 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
    }
    return c;
 #else
+   V3Vec<Value3>::Vec  myValue3List;
+   OAO_InitValue3Data(myValue3List);
+   queue<V3NetId> qSim;
+   // first simulate the _Value3List, to get the "Reference Answer"
+   for(uint i = 0, n = dfsList.size(); i < n; ++i){
+      v3SimOneGate(dfsList[i]);
+   }
+   // push PI info. into the list
+  
+   for( uint i = 0; i < _I; ++i ){
+      V3NetId pi = _ntk->getInput(i);
+      myValue3List[pi.id] = Value3( input[i], 0 );
+   }
+   
+   // push watched gate into the list
+   if(b)
+      for(uint i = 0; i < _L; ++i){
+         V3NetId FF_in = _ntk->getInputNetId(_ntk->getLatch(i), 0);
+         myValue3List[FF_in.id] = _Value3List[FF_in.id];
+         qSim.push(FF_in);
+      }
+   else{
+      myValue3List[_monitor.id] = _Value3List[_monitor.id];
+      qSim.push(_monitor);
+   }
+   
+   while(!qSim.empty()){
+      V3NetId tt = qSim.front();
+      qSim.pop();
+      //cout <<" now tt = "<< tt.id << endl;
+      if (_ntk->getGateType(tt) != AIG_NODE){
+         continue;
+      }
+      
+      // tt = X -> illegal.
+      assert(myValue3List[tt.id]._dontCare == 0);
+      
+      V3NetId in0 = _ntk->getInputNetId(tt, 0);
+      V3NetId in1 = _ntk->getInputNetId(tt, 1);
+      if(myValue3List[tt.id]._bit == 1){
+         // tt = 1
+         if(myValue3List[in0.id]._dontCare){
+            myValue3List[in0.id] = Value3( !in0.cp, 0 );
+            qSim.push(in0);
+         }
+         if(myValue3List[in1.id]._dontCare){
+            myValue3List[in1.id] = Value3( !in1.cp, 0 );
+            qSim.push(in1);
+         }
+      }
+      else{
+         // tt = 0
+         if( myValue3List[in0.id]._dontCare == 0 &&
+             myValue3List[in1.id]._dontCare == 0) continue;
+         else if( myValue3List[in0.id]._dontCare == 0 &&
+                  myValue3List[in1.id]._dontCare == 1){
+            if(myValue3List[in0.id]._bit ^ in0.cp){
+               // in0 = 1, (effictively)
+               // another fanin = 0
+               myValue3List[in1.id] = Value3( in1.cp, 0);
+               qSim.push(in1);
+            }
+         }
+         else if( myValue3List[in0.id]._dontCare == 1 &&
+                  myValue3List[in1.id]._dontCare == 0){
+            if(myValue3List[in1.id]._bit ^ in1.cp){
+               // in1 = 1, (effectively)
+               // another fanin = 0
+               myValue3List[in0.id] = Value3( in0.cp, 0);
+               qSim.push(in0);
+            }
+         }
+         else{
+            // in0 = X, in1 = X --> copy reference answer
+            #if 0
+            if( _Value3List[in0.id]._bit ^ in0.cp == 0){
+               myValue3List[in0.id] = _Value3List[in0.id];
+               qSim.push(in0);
+            }
+            else{
+               myValue3List[in1.id] = _Value3List[in1.id];
+               qSim.push(in1);
+            }
+            #else // this one is faster
+            myValue3List[in0.id] = _Value3List[in0.id];
+            myValue3List[in1.id] = _Value3List[in1.id];
+            qSim.push(in0);
+            qSim.push(in1);
+            #endif
+         }
+         
+      }
+   }
+
+   for( uint i = 0; i < _L; ++i)
+      c->_latchValues[i] = myValue3List[_ntk->getLatch(i).id];
    return c;
 #endif
 }
