@@ -517,7 +517,6 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
    // TODO: SAT generalization
    // b = 0 -> getBadCube(),  check monitor contains 'X' or not
    // b = 1 -> solveRelative, check Latch Fanins contain 'X' or not
-   
    //initValue3Data();
    static bool firstTime = true;
    static V3NetVec dfsList;
@@ -525,7 +524,6 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
       dfs(dfsList);
       firstTime = false;
    }
-
    // set initial value for PI and FFs
    for( uint i = 0; i < _I; ++i ){
       V3NetId PI = _ntk->getInput(i);
@@ -536,7 +534,7 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
       V3NetId FF = _ntk->getLatch(i);
       _Value3List[FF.id] = c->_latchValues[i];
    }
-
+#if 0 
    // for each literal in C: remove it and do sim3V 
    // check: if the output have 'x' -> undo the removel of literal
    
@@ -581,6 +579,9 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
 
    }
    return c;
+#else
+   return c;
+#endif
 }
 void V3SvrPDRSat::getSATAssignmentToCube(Cube* cube){
   // get SAT assignment from sovler if the cube is reachable from previous frame
@@ -651,9 +652,22 @@ void V3SvrPDRSat::initValue3Data(){
    for (unsigned i = 0; i < _ntk->getNetSize(); ++i){
       _Value3List.push_back(Value3(0,1));
    }
+   // OAO: set CONSTgate initial value
+   _Value3List[0] = Value3(0,0);
 }
+
+void V3SvrPDRSat::OAO_InitValue3Data(V3Vec<Value3>::Vec &myList){
+   // almost same as the function above,
+   // except that it passes in arbitory vector& myList
+   myList.clear();
+   for (unsigned i = 0; i < _ntk->getNetSize(); ++i){
+      myList.push_back(Value3(0,1));
+   }
+   myList[0] = Value3(0,0);
+}
+
 // OAO: int -> bool
-#if 1
+#if 110
 bool V3SvrPDRSat::getValue(Var v) const {
    return (_Solver->model[v] == l_True);
 }
