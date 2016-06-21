@@ -107,6 +107,7 @@ class V3SvrPDRSat
       void OAO_InitValue3Data(V3Vec<Value3>::Vec & myList);
       void dfs(V3NetVec& orderedNets);
       void v3SimOneGate(V3NetId id);
+      void OAO_v3SimOneGate(V3NetId id, V3Vec<Value3>::Vec &myList);
 #if 110
       bool getValue(Var v) const;
 #else

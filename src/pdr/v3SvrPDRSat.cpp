@@ -513,6 +513,16 @@ void V3SvrPDRSat::v3SimOneGate(V3NetId id){
     _Value3List[ id.id ] =  in1 & in2;
   }
 }
+void V3SvrPDRSat::OAO_v3SimOneGate(V3NetId id, V3Vec<Value3>::Vec& myList){
+  const V3GateType type = _ntk->getGateType(id);
+  if(type == AIG_NODE) {
+    Value3 in1 = myList[ (_ntk->getInputNetId(id, 0)).id ] ;
+    Value3 in2 = myList[ (_ntk->getInputNetId(id, 1)).id ] ;
+    in1._bit ^= (_ntk->getInputNetId(id, 0)).cp; 
+    in2._bit ^= (_ntk->getInputNetId(id, 1)).cp;
+    myList[ id.id ] =  in1 & in2;
+  }
+}
 Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
    // TODO: SAT generalization
    // b = 0 -> getBadCube(),  check monitor contains 'X' or not
@@ -561,13 +571,13 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
       }
       else{
          // check monitor
-         //#if 1 //this improves efficiency
+         #if 1 //this improves efficiency
          x_is_found = _Value3List[_monitor.id]._dontCare;
         
-         //#else
-         //if(_Value3List[_monitor.id]._dontCare == true)
-         //   x_is_found = true;
-         //#endif
+         #else
+         if(_Value3List[_monitor.id]._dontCare == true)
+            x_is_found = true;
+         #endif
       }
 
       // undo the removal if needed
@@ -588,12 +598,17 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
    for(uint i = 0, n = dfsList.size(); i < n; ++i){
       v3SimOneGate(dfsList[i]);
    }
-   // push PI info. into the list
-  
+   
+   /* //this is useless
+   // [optional] push PI info. into the list, and to 3vSim
    for( uint i = 0; i < _I; ++i ){
       V3NetId pi = _ntk->getInput(i);
       myValue3List[pi.id] = Value3( input[i], 0 );
    }
+   for(uint i = 0, n = dfsList.size(); i < n; ++i){
+      OAO_v3SimOneGate(dfsList[i], myValue3List);
+   }
+   */
    
    // push watched gate into the list
    if(b)
@@ -610,17 +625,14 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
    while(!qSim.empty()){
       V3NetId tt = qSim.front();
       qSim.pop();
-      //cout <<" now tt = "<< tt.id << endl;
-      if (_ntk->getGateType(tt) != AIG_NODE){
-         continue;
-      }
+      if (_ntk->getGateType(tt) != AIG_NODE) continue;
       
       // tt = X -> illegal.
-      assert(myValue3List[tt.id]._dontCare == 0);
+      //assert(myValue3List[tt.id]._dontCare == 0);
       
       V3NetId in0 = _ntk->getInputNetId(tt, 0);
       V3NetId in1 = _ntk->getInputNetId(tt, 1);
-      if(myValue3List[tt.id]._bit == 1){
+      if(myValue3List[tt.id]._bit){
          // tt = 1
          if(myValue3List[in0.id]._dontCare){
             myValue3List[in0.id] = Value3( !in0.cp, 0 );
@@ -633,27 +645,9 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
       }
       else{
          // tt = 0
-         if( myValue3List[in0.id]._dontCare == 0 &&
-             myValue3List[in1.id]._dontCare == 0) continue;
-         else if( myValue3List[in0.id]._dontCare == 0 &&
-                  myValue3List[in1.id]._dontCare == 1){
-            if(myValue3List[in0.id]._bit ^ in0.cp){
-               // in0 = 1, (effictively)
-               // another fanin = 0
-               myValue3List[in1.id] = Value3( in1.cp, 0);
-               qSim.push(in1);
-            }
-         }
-         else if( myValue3List[in0.id]._dontCare == 1 &&
-                  myValue3List[in1.id]._dontCare == 0){
-            if(myValue3List[in1.id]._bit ^ in1.cp){
-               // in1 = 1, (effectively)
-               // another fanin = 0
-               myValue3List[in0.id] = Value3( in0.cp, 0);
-               qSim.push(in0);
-            }
-         }
-         else{
+         if( myValue3List[in0.id]._dontCare == myValue3List[in1.id]._dontCare){
+            // in0, in1 both known -> skip
+            if (!myValue3List[in0.id]._dontCare) continue; 
             // in0 = X, in1 = X --> copy reference answer
             #if 0
             if( _Value3List[in0.id]._bit ^ in0.cp == 0){
@@ -671,7 +665,17 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
             qSim.push(in1);
             #endif
          }
-         
+         else{
+            V3NetId &knownId = myValue3List[in0.id]._dontCare? in1 : in0;
+            V3NetId &unknown = myValue3List[in0.id]._dontCare? in0 : in1;
+            if(myValue3List[knownId.id]._bit ^ knownId.cp){
+               // known = 1, (effictively)
+               // unknown fanin = 0
+               myValue3List[unknown.id] = Value3( unknown.cp, 0);
+               qSim.push(unknown);
+            }
+
+         }
       }
    }
 

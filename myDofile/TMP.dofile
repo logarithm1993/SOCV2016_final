@@ -1,3 +1,0 @@
-read aig ../hwmcc/6s389b11.aig
-satv pdr -o 0
-q -f

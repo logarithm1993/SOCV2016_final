@@ -38,7 +38,9 @@ unsigned Cube::_L = 0;
 struct cmp
 {
   bool operator() (const TCube lhs, const TCube rhs)
-                  { return lhs._frame > rhs._frame; }
+                  { 
+                     return lhs._frame > rhs._frame; 
+                  }
 };
 
 

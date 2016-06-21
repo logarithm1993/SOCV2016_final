@@ -35,7 +35,7 @@ log/*
 preplace/*
 *.out
 *.result
-
+*TMP*
 # matlab files
 *.m
 *.matlab*
