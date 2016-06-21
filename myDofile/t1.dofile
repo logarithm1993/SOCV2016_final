@@ -1,5 +1,3 @@
 read  aig ./hwmcc/6s515rb1.aig
 satv pdr -o 0
-# satv pdr -o 1
-# satv pdr -o 2
 q -f

@@ -7,6 +7,8 @@
  ****************************************************************************/
 #define showinfo 0
 
+//#define PRINT_CEX
+
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -169,6 +171,7 @@ bool PDRMgr::PDR(const V3NetId& monitor, SatProofRes& pRes){
           cerr << "Frame INF :" << (*F)[F->size()-1]->size() << endl;
         }
         // OAO: print cex here < state, input TODO >
+#ifdef PRINT_CEX
         for(int x = vCex.size()-1, s = x; x >=0; --x){
           cout<<"<time - "<< s-x << "> ";
            
@@ -182,6 +185,9 @@ bool PDRMgr::PDR(const V3NetId& monitor, SatProofRes& pRes){
           cout<<"\tstate : "; vCex[x]._cube->show();
           cout<<endl;
         }
+#else
+        cout << "[OAO] print cex is disabled now, uncomment pdrMgr.cpp:10 to enable this feature.\n";
+#endif
         return true; // Cex found
       }
     }
@@ -251,6 +257,7 @@ bool PDRMgr::recursiveBlockCube(TCube s0, vector<TCube>& vCex, vector<bool*>& vI
         if(heavy_debug) {cerr << "pushed : " << z._cube << ", "; z._cube->show();}
         Q.push(s); // put it in queue again
         if(heavy_debug) {cerr << "pushed : " << s._cube << ", "; s._cube->show();}
+        
         // OAO: record input assign. 
         bool* cexII = new bool [Z->_I];
         for (uint i = 0; i < Z->_I; ++i){
