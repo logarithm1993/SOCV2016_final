@@ -61,10 +61,14 @@ class Value3
 #endif
   }
   bool operator == (const Value3& a) const{
+#if 0 // still under testing
+     return (_bit == a._bit) && (_dontCare == a._dontCare);
+#else
     if(_dontCare ^ a._dontCare) return false;
     else if(_dontCare && a._dontCare) return true;
     else if(_bit == a._bit) return true;
     else return false;
+#endif
   }
   bool operator != (const Value3& a) const {
     return !((*this) == a);
@@ -128,10 +132,16 @@ public:
   }
   bool subsumes(Cube* s)const{
     for (uint i = 0; i < _L; ++i){
+#if 1 // it seems useless
+      if(_latchValues[i]._dontCare) continue;
+      if( (!s->_latchValues[i]._dontCare) & (_latchValues[i]._bit == s->_latchValues[i]._bit)) continue;
+      return false;
+#else
       if(!_latchValues[i]._dontCare){
         if(s->_latchValues[i]._dontCare) return false;
         if(s->_latchValues[i]._bit != _latchValues[i]._bit) return false;
       }
+#endif
     }
     return true;
   }

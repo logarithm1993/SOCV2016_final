@@ -172,8 +172,8 @@ bool PDRMgr::PDR(const V3NetId& monitor, SatProofRes& pRes){
           }
           cerr << "Frame INF :" << (*F)[F->size()-1]->size() << endl;
         }
-        // OAO: print cex here < state, input TODO >
 #ifdef PRINT_CEX
+        // OAO: print cex here < state, input >
         for(int x = vCex.size()-1, s = x; x >=0; --x){
           cout<<"<time - "<< s-x << "> ";
            
@@ -297,6 +297,9 @@ bool PDRMgr::isBlocked(TCube s){
 
 TCube PDRMgr::generalize(TCube s){
   // UNSAT generalization
+#if 0 // does it improve efficiency? no it sucks
+  return s; 
+#else 
   if(medium_debug) cerr << "UNSAT generalization\n";
   for (uint i = 0; i < L; ++i){
     Cube* tc = new Cube(s._cube);
@@ -307,6 +310,7 @@ TCube PDRMgr::generalize(TCube s){
       condAssign(s, Z->solveRelative( TCube(tc,s._frame), 1 ));
   }
   return s;
+#endif
 }
 
 bool PDRMgr::propagateBlockedCubes(SatProofRes& pRes){

@@ -498,7 +498,7 @@ void V3SvrPDRSat::dfs(V3NetVec& orderedNets){
     _ntk->dfsOrder(nId,orderedNets);
   }
 }
-void V3SvrPDRSat::v3SimOneGate(V3NetId id){
+void V3SvrPDRSat::v3SimOneGate(const V3NetId &id){
   const V3GateType type = _ntk->getGateType(id);
   if(type == AIG_NODE) {
     Value3 in1 = _Value3List[ (_ntk->getInputNetId(id, 0)).id ] ;
@@ -513,7 +513,7 @@ void V3SvrPDRSat::v3SimOneGate(V3NetId id){
     _Value3List[ id.id ] =  in1 & in2;
   }
 }
-void V3SvrPDRSat::OAO_v3SimOneGate(V3NetId id, V3Vec<Value3>::Vec& myList){
+void V3SvrPDRSat::OAO_v3SimOneGate(const V3NetId &id, V3Vec<Value3>::Vec& myList){
   const V3GateType type = _ntk->getGateType(id);
   if(type == AIG_NODE) {
     Value3 in1 = myList[ (_ntk->getInputNetId(id, 0)).id ] ;
@@ -808,9 +808,14 @@ void V3SvrPDRSat::blockCubeInSolver(TCube s){
   Lit l;
   for (uint i = 0; i < _L; ++i){
     if(!(s._cube->_latchValues[i]._dontCare)){
+      #if 1  // not sure if this improves efficiency
+      l = mkLit(getVerifyData(_ntk->getLatch(i),0), 
+                s._cube->_latchValues[i]._bit);
+      #else // this one is easier to read 
       l = s._cube->_latchValues[i]._bit ?
         mkLit(getVerifyData(_ntk->getLatch(i),0), true ) :
         mkLit(getVerifyData(_ntk->getLatch(i),0), false);
+      #endif      
       lits.push(l);
     }
   }
@@ -832,9 +837,14 @@ Var V3SvrPDRSat::addNotSToSolver(Cube* c){
   Lit l;
   for (uint i = 0; i < _L; ++i){
     if(!(c->_latchValues[i]._dontCare)){
+      #if 1
+       l = mkLit(getVerifyData(_ntk->getLatch(i),0),
+                 c->_latchValues[i]._bit);
+      #else 
       l = c->_latchValues[i]._bit ?
         mkLit(getVerifyData(_ntk->getLatch(i),0), true ) :
         mkLit(getVerifyData(_ntk->getLatch(i),0), false);
+      #endif
       lits.push(l);
     }
   }
@@ -862,8 +872,13 @@ void V3SvrPDRSat::addNextStateSToSolver(Cube* c, vector<Lit>& Lit_vec_origin){
     /*cerr << "invert?" << id.cp << endl;*/
     if(c->_latchValues[i]._dontCare == 0){
       bool p = (c->_latchValues[i]._bit ^ id.cp ) ;
+#if 1
+      _assump.push( mkLit(tmp, !p) );
+      Lit_vec_origin.push_back( mkLit(tmp, !p) );
+#else
       _assump.push( p ? mkLit(tmp,false): mkLit(tmp,true));
       Lit_vec_origin.push_back( p ? mkLit(tmp,false): mkLit(tmp,true));
+#endif
     }
     else Lit_vec_origin.push_back( Lit(0) ); // use Lit(0) to represent NULL
   }
@@ -895,7 +910,13 @@ Cube* V3SvrPDRSat::UNSATGeneralizationWithUNSATCore(Cube * c, vector<Lit>& Lit_v
   for (uint i = 0; i < Lit_vec_origin.size(); ++i){
     for (int j = 0; j < _Solver -> conflict.size(); ++j){
       if (Lit_vec_origin[i] != Lit(0) ){
-        if( ~(Lit_vec_origin[i]) == _Solver -> conflict[j] ){
+#if 1
+         if(var(Lit_vec_origin[i]) == var(_Solver->conflict[j])){
+           Lit_vec_new[i] = Lit_vec_origin[i];
+           break;
+         }
+#else
+         if( ~(Lit_vec_origin[i]) == _Solver -> conflict[j] ){
           Lit_vec_new[i] = Lit_vec_origin[i];
           break;
         }
@@ -903,6 +924,7 @@ Cube* V3SvrPDRSat::UNSATGeneralizationWithUNSATCore(Cube * c, vector<Lit>& Lit_v
           Lit_vec_new[i] = Lit_vec_origin[i];
           break;
         }
+#endif
       }
     }
   }
@@ -914,10 +936,15 @@ Cube* V3SvrPDRSat::UNSATGeneralizationWithUNSATCore(Cube * c, vector<Lit>& Lit_v
   }
 
   if(isInitial(tmpCube)){ // if tc isInitial ,then use origin
+#if 1
+     delete tmpCube;
+     return c;
+#else
     assert(c->_latchValues);
     for (uint i = 0; i < _L; ++i){
       tmpCube->_latchValues[i] = c->_latchValues[i];
     }
+#endif
   }
   return tmpCube;
 }
