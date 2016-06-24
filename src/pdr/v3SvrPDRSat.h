@@ -7,7 +7,7 @@
 ****************************************************************************/
 #define heavy_debug 0
 #define medium_debug 0
-#define soft_debug 0
+#define soft_debug 1
 
 #ifndef V3_SVR_MSAT_H
 #define V3_SVR_MSAT_H
@@ -108,6 +108,7 @@ class V3SvrPDRSat
       void v3SimOneGate(const V3NetId &id);
       void OAO_InitValue3Data(V3Vec<Value3>::Vec & myList);
       void OAO_v3SimOneGate(const V3NetId &id, V3Vec<Value3>::Vec &myList);
+      void OAO_recycleSatSolver();
 #if 110
       bool getValue(Var v) const;
 #else
@@ -142,7 +143,7 @@ class V3SvrPDRSat
       V3NetId                   _monitor;   // The Bad Output
       V3Vec<Value3>::Vec        _Value3List;// Mapping between V3NetId and Value3
                                             // Used for simulation
-
+      int                       _tmpVarNum; // OAO: used for recycling satSolver
 };
 
 #endif
