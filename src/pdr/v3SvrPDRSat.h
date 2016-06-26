@@ -7,7 +7,7 @@
 ****************************************************************************/
 #define heavy_debug 0
 #define medium_debug 0
-#define soft_debug 1
+#define soft_debug 0
 
 #ifndef V3_SVR_MSAT_H
 #define V3_SVR_MSAT_H
@@ -109,7 +109,7 @@ class V3SvrPDRSat
       void OAO_InitValue3Data(V3Vec<Value3>::Vec & myList);
       void OAO_v3SimOneGate(const V3NetId &id, V3Vec<Value3>::Vec &myList);
       void OAO_recycleSatSolver();
-#if 110
+#if 0
       bool getValue(Var v) const;
 #else
       int getValue(Var v) const;
@@ -136,7 +136,7 @@ class V3SvrPDRSat
       vec<Lit>                  _assump;    // Assumption List for assumption solve
       V3SvrMLitData             _init;      // Initial state Var storage
       V3SvrMVarData*            _ntkData;   // Mapping between V3NetId and Solver Data (Vars)
-      vector< vector<Cube* >* >*  _F;         // PDR Frames
+      vector< vector<Cube* >* >*  _F;       // PDR Frames
       const size_t              _L;         // Latch size
       const size_t              _I;         // Input size
       vector<Var>               _actVars;   // Activation Vars

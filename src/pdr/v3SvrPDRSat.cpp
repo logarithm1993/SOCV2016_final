@@ -21,7 +21,7 @@
 #include <cmath>
 
 
-#define  RECYCLE_THRESHOLD 5000
+#define  RECYCLE_THRESHOLD 10000
 /* -------------------------------------------------- *\
  * Class V3SvrPDRSat Implementations
 \* -------------------------------------------------- */
@@ -631,7 +631,6 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
       
       // tt = X -> illegal.
       //assert(myValue3List[tt.id]._dontCare == 0);
-      
       V3NetId in0 = _ntk->getInputNetId(tt, 0);
       V3NetId in1 = _ntk->getInputNetId(tt, 1);
       if(myValue3List[tt.id]._bit){
@@ -770,7 +769,7 @@ void V3SvrPDRSat::OAO_InitValue3Data(V3Vec<Value3>::Vec &myList){
 }
 
 // OAO: int -> bool
-#if 110
+#if 0
 bool V3SvrPDRSat::getValue(Var v) const {
    return (_Solver->model[v] == l_True);
 }
@@ -938,7 +937,7 @@ Cube* V3SvrPDRSat::UNSATGeneralizationWithUNSATCore(Cube * c, vector<Lit>& Lit_v
   }
 
   if(isInitial(tmpCube)){ // if tc isInitial ,then use origin
-#if 1
+#if 0
      delete tmpCube;
      return c;
 #else
@@ -980,6 +979,13 @@ TCube V3SvrPDRSat::solveRelative(TCube s, size_t param){
   //param 0 = if the query satisfiable, just return (CUBE NULL, FRAME NULL).
   /*Parameter 1 “EXTRACTMODEL” means: SAT ? [ Rk-1 and !s and T and s' ]
     Parameter 2 “NOIND”        means: SAT ? [ Rk-1 and T and s' ] */
+  
+  // OAO_recycle
+  if( param == 1 ){
+    ++_tmpVarNum;
+    //OAO_recycleSatSolver();
+  }
+
   if(soft_debug){
     cerr << "--Solve Relative in frame : "<< s._frame << " param : " << param;
     cerr << ", cube is : ";s._cube->show();
@@ -1011,12 +1017,7 @@ TCube V3SvrPDRSat::solveRelative(TCube s, size_t param){
     }
     cerr << endl;
   }
-  // OAO
-  if( param == 1 ){
-    ++_tmpVarNum;
-    OAO_recycleSatSolver();
-  }
-
+  
   // SAT solve here
   if(assump_solve()){ //SAT
     if(soft_debug) cerr << "result: SAT , ";
@@ -1069,47 +1070,45 @@ TCube V3SvrPDRSat::solveRelative(TCube s, size_t param){
 void V3SvrPDRSat::OAO_recycleSatSolver()
 {
   
-   if( _Solver->nVars() < RECYCLE_THRESHOLD || _Solver->nVars() > 2*_tmpVarNum )
+  if( _Solver->nVars() < RECYCLE_THRESHOLD || _Solver->nVars() > 3*_tmpVarNum/2 )
       return;
-   cout << "Recycling~\n";
-   cout <<"clause num before recycle: " << _Solver->clauses.size() <<endl;
-   _tmpVarNum = 0; 
-   
-   reset();
-
+  
+  cout << "Recycling~\n";
+  cout << "clause num before recycle: " << _Solver->clauses.size() <<endl;
+  cout << "var    num before recycle: " << _Solver->nVars() <<endl;
+  _tmpVarNum = 0; 
+  reset();
+  
   // reconstruct ckt model
-
   for (uint32_t i = 0; i < _ntk->getLatchSize(); ++i)
     addBoundedVerifyData(_ntk->getLatch(i), 0);
   for (uint32_t i = 0; i < _ntk->getLatchSize(); ++i)
     addBoundedVerifyData(_ntk->getLatch(i), 1);
   addBoundedVerifyData(_monitor, 0);
 
-  cout <<"clause num during recycle: " << _Solver->clauses.size() <<endl;
-  cout << "actSize: "<< _actVars.size()<< endl;
+  //cout << "actSize: "<< _actVars.size()<< endl;
   cout << "totalFrame: " << (*_F).size() <<endl;
   // rebuild _actVars and Tcube clauses
-  //_actVars.clear();
   
+  for (uint i = 0, n = _actVars.size(); i < n; ++i)
+    _actVars[i] = newVar(1);
   
-  // F[0]
-  //newActVar(); 
+  // F[0] 
   addInitiateState();
   // F[1] ~ F[inf]
-  for(uint i = 1, n1 = _F->size(); i < n1; ++i){
-     //if( i != n1-1 )
-     //   newActVar();
-     cout <<"[" <<i <<"]" << (*_F)[i]->size() <<endl;
-     for(uint j = 0, n2 = (*_F)[i]->size(); j < n2; ++j){
-        uint  t = (i == (n1-1) )? INT_MAX : i;
-        Cube* c = (*(*_F)[i])[j];
-        TCube s = TCube(c, t);
-        blockCubeInSolver(s);
-     }
+  for(int i = 0, n1 = _F->size(); i < n1; ++i){
+    int t = (i == (n1-1) ) ? INT_MAX : i;
+    //cout <<"[" <<i <<"] " << (*_F)[i]->size() <<endl;
+    for(int j = 0, n2 = ((*_F)[i])->size(); j < n2; ++j){
+      Cube* c = (*((*_F)[i]))[j];
+      blockCubeInSolver( TCube(c,t) );
+    }
   }
   
-  cout <<"clause num after recycle: " << _Solver->clauses.size() <<endl;
+  cout << "clause num after recycle: " << _Solver->clauses.size() <<endl;
+  cout << "var    num after recycle: " << _Solver->nVars() <<endl;
   cout << "done\n";
+  cout << "-------------\n";
 }
 
 #endif

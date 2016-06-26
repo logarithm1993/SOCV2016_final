@@ -7,7 +7,7 @@
  ****************************************************************************/
 #define showinfo 0
 
-//#define PRINT_CEX
+#define PRINT_CEX
 
 #include <fstream>
 #include <iostream>
@@ -194,6 +194,7 @@ bool PDRMgr::PDR(const V3NetId& monitor, SatProofRes& pRes){
       }
     }
     else{
+      Z->OAO_recycleSatSolver();
       depth++;  // only here the depth will be increase
       newFrame();
       if(propagateBlockedCubes(pRes)){

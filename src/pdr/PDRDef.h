@@ -9,6 +9,7 @@
 #define show_address 0
 
 #include <iostream>
+#include <cassert>
 
 #ifndef PDRDEF_H
 #define PDRDEF_H
@@ -132,7 +133,7 @@ public:
   }
   bool subsumes(Cube* s)const{
     for (uint i = 0; i < _L; ++i){
-#if 1 // it seems useless
+#if 0 // it seems useless
       if(_latchValues[i]._dontCare) continue;
       if( (!s->_latchValues[i]._dontCare) & (_latchValues[i]._bit == s->_latchValues[i]._bit)) continue;
       return false;
