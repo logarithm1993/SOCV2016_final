@@ -1068,42 +1068,48 @@ TCube V3SvrPDRSat::solveRelative(TCube s, size_t param){
 
 void V3SvrPDRSat::OAO_recycleSatSolver()
 {
-   // TODO:
-   return;
+  
    if( _Solver->nVars() < RECYCLE_THRESHOLD || _Solver->nVars() > 2*_tmpVarNum )
-   //if(_Solver->nVars() < 20 ) 
       return;
    cout << "Recycling~\n";
+   cout <<"clause num before recycle: " << _Solver->clauses.size() <<endl;
    _tmpVarNum = 0; 
+   
    reset();
 
   // reconstruct ckt model
+
   for (uint32_t i = 0; i < _ntk->getLatchSize(); ++i)
-     addBoundedVerifyData(_ntk->getLatch(i), 0);
+    addBoundedVerifyData(_ntk->getLatch(i), 0);
   for (uint32_t i = 0; i < _ntk->getLatchSize(); ++i)
-     addBoundedVerifyData(_ntk->getLatch(i), 1);
+    addBoundedVerifyData(_ntk->getLatch(i), 1);
   addBoundedVerifyData(_monitor, 0);
 
-  
+  cout <<"clause num during recycle: " << _Solver->clauses.size() <<endl;
   cout << "actSize: "<< _actVars.size()<< endl;
-  cout << "totalFram: " << (*_F).size() <<endl;
+  cout << "totalFrame: " << (*_F).size() <<endl;
   // rebuild _actVars and Tcube clauses
-   _actVars.clear();
-   // F[0]
-   newActVar(); addInitiateState();
-   for(uint i = 1, n1 = _F->size(); i < n1; ++i){
-      if( i != n1-1 )
-         newActVar();
-      cout <<"[" <<i <<"]" << (*_F)[i]->size() <<endl;
-      for(uint j = 0, n2 = (*_F)[i]->size(); j < n2; ++j){
-         uint  t = (i == (n1-1) )? INT_MAX : i;
-         Cube* c = (*(*_F)[i])[j];
-         TCube s = TCube(c, t);
-         blockCubeInSolver(s);
-      }
-   }
-   // _ntkData recovery
-   cout << "done\n";
+  //_actVars.clear();
+  
+  
+  // F[0]
+  //newActVar(); 
+  addInitiateState();
+  // F[1] ~ F[inf]
+  for(uint i = 1, n1 = _F->size(); i < n1; ++i){
+     //if( i != n1-1 )
+     //   newActVar();
+     cout <<"[" <<i <<"]" << (*_F)[i]->size() <<endl;
+     for(uint j = 0, n2 = (*_F)[i]->size(); j < n2; ++j){
+        uint  t = (i == (n1-1) )? INT_MAX : i;
+        Cube* c = (*(*_F)[i])[j];
+        TCube s = TCube(c, t);
+        blockCubeInSolver(s);
+     }
+  }
+  
+  cout <<"clause num after recycle: " << _Solver->clauses.size() <<endl;
+  cout << "done\n";
 }
 
 #endif
