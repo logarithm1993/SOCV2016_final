@@ -1,0 +1,4 @@
+[1] current File = 6s372rb26.aig
+v3> read aig ../hwmcc/6s372rb26.aig
+
+v3> satv pdr -o 0

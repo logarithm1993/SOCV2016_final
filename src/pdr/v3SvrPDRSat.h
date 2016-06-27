@@ -109,7 +109,7 @@ class V3SvrPDRSat
       void OAO_InitValue3Data(V3Vec<Value3>::Vec & myList);
       void OAO_v3SimOneGate(const V3NetId &id, V3Vec<Value3>::Vec &myList);
       void OAO_recycleSatSolver();
-#if 0
+#if 123
       bool getValue(Var v) const;
 #else
       int getValue(Var v) const;

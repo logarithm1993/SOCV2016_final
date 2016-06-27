@@ -114,6 +114,10 @@ public:
       _latchValues = NULL;
     }
   }
+  Cube(Cube* c, char* str)
+  {
+    _latchValues = c->_latchValues;
+  }
   Cube(const Cube& c){
     if(c._latchValues){
       _latchValues = new Value3[_L];
@@ -174,6 +178,7 @@ class TCube
       cerr << c << endl;
     }
   }
+  
   TCube(const TCube& t){
     if(show_address){
       cerr << "copy constructor\n";

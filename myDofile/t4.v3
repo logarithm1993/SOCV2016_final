@@ -1,4 +1,0 @@
-read  aig ./hwmcc/6s388b07.aig
-set safety 0
-verify pdr p1
-q -f

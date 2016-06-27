@@ -7,7 +7,7 @@
  ****************************************************************************/
 #define showinfo 0
 
-#define PRINT_CEX
+//#define PRINT_CEX
 
 #include <fstream>
 #include <iostream>
@@ -178,7 +178,7 @@ bool PDRMgr::PDR(const V3NetId& monitor, SatProofRes& pRes){
           cout<<"<time - "<< s-x << "> ";
            
           cout<<"input : ";
-          for(uint y = 0; y < Z->_I; ++y){
+          for(uint y = Z->_I-1; y != 0; --y){
             if(x)
               cout<< (vInput[x-1][y]? "1" : "0");
             else
@@ -194,8 +194,8 @@ bool PDRMgr::PDR(const V3NetId& monitor, SatProofRes& pRes){
       }
     }
     else{
-      Z->OAO_recycleSatSolver();
       depth++;  // only here the depth will be increase
+      //cout << "depth = " << depth <<" timeFrame = " << F->size()-1  <<" clauseNum = " << Z->_Solver->nClauses() << endl;
       newFrame();
       if(propagateBlockedCubes(pRes)){
         if(showinfo){
@@ -228,8 +228,8 @@ bool PDRMgr::recursiveBlockCube(TCube s0, vector<TCube>& vCex, vector<bool*>& vI
       return false;
 
     if( isBlocked(s) == false ){
-
-      assert(! (Z->isInitial( s._cube ) ));
+      
+      //assert(! (Z->isInitial( s._cube ) ));
 
       TCube z = Z->solveRelative(s,1);
       
@@ -298,20 +298,21 @@ bool PDRMgr::isBlocked(TCube s){
 
 TCube PDRMgr::generalize(TCube s){
   // UNSAT generalization
-#if 0 // does it improve efficiency? no it sucks
-  return s; 
-#else 
   if(medium_debug) cerr << "UNSAT generalization\n";
   for (uint i = 0; i < L; ++i){
+#if 1 //do not copy <TCube s> if i'th var is a dontCare term
+    if(s._cube->_latchValues[i]._dontCare) continue;
+    Cube* tc = new Cube(s._cube);
+    tc->_latchValues[i]._dontCare = 1;
+#else
     Cube* tc = new Cube(s._cube);
     if (tc->_latchValues[i]._dontCare == 1) continue;
     else tc->_latchValues[i]._dontCare = 1;
-
+#endif
     if( !(Z->isInitial(tc)) )
       condAssign(s, Z->solveRelative( TCube(tc,s._frame), 1 ));
   }
   return s;
-#endif
 }
 
 bool PDRMgr::propagateBlockedCubes(SatProofRes& pRes){
@@ -322,7 +323,8 @@ bool PDRMgr::propagateBlockedCubes(SatProofRes& pRes){
       TCube s = Z -> solveRelative ( TCube((*((*F)[k]))[i],k+1) , 2);
       if(s._frame != -1) addBlockedCube(s);
     }
-    if ((*F)[k]->size() == 0 ){ pRes.setProved(k);return true;}
+    //if ((*F)[k]->size() == 0 ){ pRes.setProved(k);return true;}
+    if ((*F)[k]->empty()){ pRes.setProved(k);return true;}
   }
   return false;
 }
@@ -350,8 +352,7 @@ bool PDRMgr::condAssign(TCube& s, TCube t){
     s = t;
     return true;
   }
-  else
-    return false;
+  return false;
 }
 
 void PDRMgr::addBlockedCube(TCube s){
@@ -382,7 +383,7 @@ void PDRMgr::addBlockedCube(TCube s){
         (*F)[d] -> pop_back();
       }
       else
-        i++;
+        ++i;
     }
   }
 

@@ -29,7 +29,18 @@ int main(int argc, char** argv){
 
    ofstream doFile;
    if(!option){
-      cout << "do all comming sooooon\n";
+       for(int i = 0; i < 45; ++i){
+         string thisFile = vFileName[i];
+         cout <<"[" << i+1 << "] current File = " << thisFile << endl;       
+         doFile.open("./TMP.dofile");
+         doFile << "read aig ../hwmcc/" << thisFile << endl;
+         doFile << "satv pdr -o 0\n";
+         doFile << "q -f\n";
+         doFile.close();
+         string sysStr = "timeout 900 ../pdrv -f TMP.dofile \n";
+         system( sysStr.c_str() );
+         cout << "--------------------------\n";
+      }
    }
    else{
       for(int i = 0; i < 9; ++i){
@@ -40,7 +51,7 @@ int main(int argc, char** argv){
          doFile << "satv pdr -o 0\n";
          doFile << "q -f\n";
          doFile.close();
-         string sysStr = "timeout 300 ../pdrv -f TMP.dofile \n";
+         string sysStr = "timeout 900 ../pdrv -f TMP.dofile \n";
          system( sysStr.c_str() );
          cout << "--------------------------\n";
       }

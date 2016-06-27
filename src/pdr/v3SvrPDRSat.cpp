@@ -21,7 +21,7 @@
 #include <cmath>
 
 
-#define  RECYCLE_THRESHOLD 10000
+#define  RECYCLE_THRESHOLD 30000
 /* -------------------------------------------------- *\
  * Class V3SvrPDRSat Implementations
 \* -------------------------------------------------- */
@@ -769,7 +769,7 @@ void V3SvrPDRSat::OAO_InitValue3Data(V3Vec<Value3>::Vec &myList){
 }
 
 // OAO: int -> bool
-#if 0
+#if 123
 bool V3SvrPDRSat::getValue(Var v) const {
    return (_Solver->model[v] == l_True);
 }
@@ -791,9 +791,15 @@ bool V3SvrPDRSat::isBlocked(TCube c){
 bool V3SvrPDRSat::isInitial(Cube* c){
   // check if a cube subsumes R0
   for (unsigned i = 0; i < _L; ++i){
+#if 1
+    if(c->_latchValues[i]._dontCare == 1) continue;
+    if(c->_latchValues[i]._bit == 0 ) continue;
+    return false;
+#else
     if(c->_latchValues[i]._bit == 1 &&
        c->_latchValues[i]._dontCare == 0)
       return false;
+#endif
   }
   return true;
 }
@@ -896,10 +902,14 @@ void V3SvrPDRSat::addNextStateSToSolver(Cube* c, vector<Lit>& Lit_vec_origin){
 
 Cube* V3SvrPDRSat::UNSATGeneralizationWithUNSATCore(Cube * c, vector<Lit>& Lit_vec_origin){
   vector<Lit> Lit_vec_new;
+#if 1  
+  Lit_vec_new.resize(_L, Lit(0));
+#else
   Lit_vec_new.resize(_L);
   for (unsigned i = 0; i < _L; ++i){
     Lit_vec_new[i] = Lit(0);
   }
+#endif
   if(heavy_debug){
     cerr <<  "conflict core : ";
     for (int j = 0; j < _Solver -> conflict.size(); ++j){
@@ -910,7 +920,7 @@ Cube* V3SvrPDRSat::UNSATGeneralizationWithUNSATCore(Cube * c, vector<Lit>& Lit_v
   // find which lit is in unsat core and generalize the cube
   for (uint i = 0; i < Lit_vec_origin.size(); ++i){
     for (int j = 0; j < _Solver -> conflict.size(); ++j){
-      if (Lit_vec_origin[i] != Lit(0) ){
+      if (Lit_vec_origin[i].x){
 #if 1
          if(var(Lit_vec_origin[i]) == var(_Solver->conflict[j])){
            Lit_vec_new[i] = Lit_vec_origin[i];
@@ -932,21 +942,34 @@ Cube* V3SvrPDRSat::UNSATGeneralizationWithUNSATCore(Cube * c, vector<Lit>& Lit_v
 
   Cube* tmpCube = new Cube(c);
   //bool tmpb;
+#if 1  // this one do not discard the cube even when isInitial() is true
+  bool* bkup   = NULL;
+  bool  isInit = true;
   for (uint i = 0; i < _L; ++i){
-    if(Lit_vec_new[i] == Lit(0)) tmpCube->_latchValues[i]._dontCare = 1;
+    //if(Lit_vec_new[i] == Lit(0)) 
+    tmpCube->_latchValues[i]._dontCare = !(Lit_vec_new[i].x);
+    if(tmpCube->_latchValues[i]._bit){
+      if (tmpCube->_latchValues[i]._dontCare)
+        bkup = &(tmpCube->_latchValues[i]._dontCare);
+      isInit &= tmpCube->_latchValues[i]._dontCare;
+    }
+  }
+  if (isInit){
+    //cout<<"something happend..\n";
+    (*bkup) = 0;
+  }
+#else // original one will discard the cube when it intersect with R0
+  for (uint i = 0; i < _L; ++i){
+    if(Lit_vec_new[i] == Lit(0))  tmpCube->_latchValues[i]._dontCare = 1;
   }
 
   if(isInitial(tmpCube)){ // if tc isInitial ,then use origin
-#if 0
-     delete tmpCube;
-     return c;
-#else
     assert(c->_latchValues);
     for (uint i = 0; i < _L; ++i){
       tmpCube->_latchValues[i] = c->_latchValues[i];
     }
-#endif
   }
+#endif
   return tmpCube;
 }
 void V3SvrPDRSat::assertCubeUNSAT(Cube*c, uint d){
@@ -983,7 +1006,7 @@ TCube V3SvrPDRSat::solveRelative(TCube s, size_t param){
   // OAO_recycle
   if( param == 1 ){
     ++_tmpVarNum;
-    //OAO_recycleSatSolver();
+    OAO_recycleSatSolver();
   }
 
   if(soft_debug){
@@ -1069,13 +1092,19 @@ TCube V3SvrPDRSat::solveRelative(TCube s, size_t param){
 
 void V3SvrPDRSat::OAO_recycleSatSolver()
 {
+  static bool smallCase = true;
+  if( _Solver->nClauses() > RECYCLE_THRESHOLD)
+    smallCase = false;
+  if(smallCase || _Solver->nVars() > 2*_tmpVarNum) 
+    return;
   
-  if( _Solver->nVars() < RECYCLE_THRESHOLD || _Solver->nVars() > 3*_tmpVarNum/2 )
-      return;
+  uint nFrame = _F->size()-1;
   
-  cout << "Recycling~\n";
+  cout << "Recycling @timeFrame = " << nFrame << "\n";
+/*  
   cout << "clause num before recycle: " << _Solver->clauses.size() <<endl;
   cout << "var    num before recycle: " << _Solver->nVars() <<endl;
+*/
   _tmpVarNum = 0; 
   reset();
   
@@ -1086,10 +1115,8 @@ void V3SvrPDRSat::OAO_recycleSatSolver()
     addBoundedVerifyData(_ntk->getLatch(i), 1);
   addBoundedVerifyData(_monitor, 0);
 
-  //cout << "actSize: "<< _actVars.size()<< endl;
-  cout << "totalFrame: " << (*_F).size() <<endl;
-  // rebuild _actVars and Tcube clauses
   
+  // rebuild _actVars and Tcube clauses
   for (uint i = 0, n = _actVars.size(); i < n; ++i)
     _actVars[i] = newVar(1);
   
@@ -1098,17 +1125,17 @@ void V3SvrPDRSat::OAO_recycleSatSolver()
   // F[1] ~ F[inf]
   for(int i = 0, n1 = _F->size(); i < n1; ++i){
     int t = (i == (n1-1) ) ? INT_MAX : i;
-    //cout <<"[" <<i <<"] " << (*_F)[i]->size() <<endl;
     for(int j = 0, n2 = ((*_F)[i])->size(); j < n2; ++j){
       Cube* c = (*((*_F)[i]))[j];
       blockCubeInSolver( TCube(c,t) );
     }
   }
-  
+ /* 
   cout << "clause num after recycle: " << _Solver->clauses.size() <<endl;
   cout << "var    num after recycle: " << _Solver->nVars() <<endl;
   cout << "done\n";
   cout << "-------------\n";
+ */
 }
 
 #endif

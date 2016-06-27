@@ -1,0 +1,15 @@
+[1] current File = 6s282b01.aig
+v3> read aig ../hwmcc/6s282b01.aig
+
+v3> satv pdr -o 0
+
+Monitor "13959" is safe.
+runTime:6.72703
+
+v3> q -f
+
+--------------------------
+[2] current File = 6s289rb00529.aig
+v3> read aig ../hwmcc/6s289rb00529.aig
+
+v3> satv pdr -o 0
