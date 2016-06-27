@@ -1006,9 +1006,10 @@ TCube V3SvrPDRSat::solveRelative(TCube s, size_t param){
   // OAO_recycle
   if( param == 1 ){
     ++_tmpVarNum;
-    OAO_recycleSatSolver();
   }
-
+  else
+    OAO_recycleSatSolver();
+  
   if(soft_debug){
     cerr << "--Solve Relative in frame : "<< s._frame << " param : " << param;
     cerr << ", cube is : ";s._cube->show();
