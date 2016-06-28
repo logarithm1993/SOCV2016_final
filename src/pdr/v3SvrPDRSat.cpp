@@ -546,7 +546,7 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
       V3NetId FF = _ntk->getLatch(i);
       _Value3List[FF.id] = c->_latchValues[i];
    }
-#if 0 
+#if 0 // original 3 value sim 
    // for each literal in C: remove it and do sim3V 
    // check: if the output have 'x' -> undo the removel of literal
    
@@ -592,7 +592,7 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
 
    }
    return c;
-#else
+#else // backward 3-value sim
    V3Vec<Value3>::Vec  myValue3List;
    OAO_InitValue3Data(myValue3List);
    queue<V3NetId> qSim;
@@ -602,7 +602,7 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
    }
    
    /* //this is useless
-   // [optional] push PI info. into the list, and to 3vSim
+   // [optional] push PI info. into the list, and do 3vSim on myList
    for( uint i = 0; i < _I; ++i ){
       V3NetId pi = _ntk->getInput(i);
       myValue3List[pi.id] = Value3( input[i], 0 );
@@ -650,21 +650,10 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
             // in0, in1 both known -> skip
             if (!myValue3List[in0.id]._dontCare) continue; 
             // in0 = X, in1 = X --> copy reference answer
-            #if 0
-            if( _Value3List[in0.id]._bit ^ in0.cp == 0){
-               myValue3List[in0.id] = _Value3List[in0.id];
-               qSim.push(in0);
-            }
-            else{
-               myValue3List[in1.id] = _Value3List[in1.id];
-               qSim.push(in1);
-            }
-            #else // this one is faster
             myValue3List[in0.id] = _Value3List[in0.id];
             myValue3List[in1.id] = _Value3List[in1.id];
             qSim.push(in0);
             qSim.push(in1);
-            #endif
          }
          else{
             V3NetId &knownId = myValue3List[in0.id]._dontCare? in1 : in0;
@@ -675,7 +664,6 @@ Cube* V3SvrPDRSat::ternarySimulation(Cube* c, bool b, bool* input){
                myValue3List[unknown.id] = Value3( unknown.cp, 0);
                qSim.push(unknown);
             }
-
          }
       }
    }
@@ -815,7 +803,7 @@ void V3SvrPDRSat::blockCubeInSolver(TCube s){
   Lit l;
   for (uint i = 0; i < _L; ++i){
     if(!(s._cube->_latchValues[i]._dontCare)){
-      #if 1  // not sure if this improves efficiency
+      #if 1  // this improves efficiency (probably)
       l = mkLit(getVerifyData(_ntk->getLatch(i),0), 
                 s._cube->_latchValues[i]._bit);
       #else // this one is easier to read 
@@ -1102,10 +1090,6 @@ void V3SvrPDRSat::OAO_recycleSatSolver()
   uint nFrame = _F->size()-1;
   
   cout << "Recycling @timeFrame = " << nFrame << "\n";
-/*  
-  cout << "clause num before recycle: " << _Solver->clauses.size() <<endl;
-  cout << "var    num before recycle: " << _Solver->nVars() <<endl;
-*/
   _tmpVarNum = 0; 
   reset();
   
@@ -1131,12 +1115,6 @@ void V3SvrPDRSat::OAO_recycleSatSolver()
       blockCubeInSolver( TCube(c,t) );
     }
   }
- /* 
-  cout << "clause num after recycle: " << _Solver->clauses.size() <<endl;
-  cout << "var    num after recycle: " << _Solver->nVars() <<endl;
-  cout << "done\n";
-  cout << "-------------\n";
- */
 }
 
 #endif

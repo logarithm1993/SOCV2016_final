@@ -62,14 +62,10 @@ class Value3
 #endif
   }
   bool operator == (const Value3& a) const{
-#if 0 // still under testing
-     return (_bit == a._bit) && (_dontCare == a._dontCare);
-#else
     if(_dontCare ^ a._dontCare) return false;
     else if(_dontCare && a._dontCare) return true;
     else if(_bit == a._bit) return true;
     else return false;
-#endif
   }
   bool operator != (const Value3& a) const {
     return !((*this) == a);

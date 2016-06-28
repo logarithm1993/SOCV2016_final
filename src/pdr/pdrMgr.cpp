@@ -7,7 +7,7 @@
  ****************************************************************************/
 #define showinfo 0
 
-//#define PRINT_CEX
+#define PRINT_CEX
 
 #include <fstream>
 #include <iostream>

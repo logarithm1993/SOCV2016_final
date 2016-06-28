@@ -1,3 +1,0 @@
-read aig ../testcase/6s335rb09.aig
-satv pdr -o 0
-q -f

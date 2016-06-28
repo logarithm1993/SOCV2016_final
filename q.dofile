@@ -1,3 +1,0 @@
-read aig ../testcase/oski3ub2i.aig
-satv pdr -o 0
-q -f

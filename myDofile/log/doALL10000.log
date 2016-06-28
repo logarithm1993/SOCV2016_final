@@ -1,0 +1,411 @@
+[1] current File = 6s209b0.aig
+v3> read aig ../hwmcc/6s209b0.aig
+
+v3> satv pdr -o 0
+--------------------------
+[2] current File = 6s210b037.aig
+v3> read aig ../hwmcc/6s210b037.aig
+
+v3> satv pdr -o 0
+[OAO] print cex is disabled now, uncomment pdrMgr.cpp:10 to enable this feature.
+
+Monitor "8094" is violated.
+runTime:28.0212
+
+v3> q -f
+
+--------------------------
+[3] current File = 6s210b105.aig
+v3> read aig ../hwmcc/6s210b105.aig
+
+v3> satv pdr -o 0
+Recycling @timeFrame = 7
+Recycling @timeFrame = 8
+[OAO] print cex is disabled now, uncomment pdrMgr.cpp:10 to enable this feature.
+
+Monitor "8230" is violated.
+runTime:61.4307
+
+v3> q -f
+
+--------------------------
+[4] current File = 6s215rb0.aig
+v3> read aig ../hwmcc/6s215rb0.aig
+
+v3> satv pdr -o 0
+Recycling @timeFrame = 4
+Recycling @timeFrame = 10
+Recycling @timeFrame = 10
+[OAO] print cex is disabled now, uncomment pdrMgr.cpp:10 to enable this feature.
+
+Monitor "10871" is violated.
+runTime:521.603
+
+v3> q -f
+
+--------------------------
+[5] current File = 6s221rb18.aig
+v3> read aig ../hwmcc/6s221rb18.aig
+
+v3> satv pdr -o 0
+
+Monitor "75884" is safe.
+runTime:0.39762
+
+v3> q -f
+
+--------------------------
+[6] current File = 6s275rb253.aig
+v3> read aig ../hwmcc/6s275rb253.aig
+
+v3> satv pdr -o 0
+Recycling @timeFrame = 4
+Recycling @timeFrame = 6
+
+Monitor "~v3_Internal_Net_28335" is safe.
+runTime:763.932
+
+v3> q -f
+
+--------------------------
+[7] current File = 6s275rb318.aig
+v3> read aig ../hwmcc/6s275rb318.aig
+
+v3> satv pdr -o 0
+--------------------------
+[8] current File = 6s277rb292.aig
+v3> read aig ../hwmcc/6s277rb292.aig
+
+v3> satv pdr -o 0
+--------------------------
+[9] current File = 6s277rb342.aig
+v3> read aig ../hwmcc/6s277rb342.aig
+
+v3> satv pdr -o 0
+--------------------------
+[10] current File = 6s282b01.aig
+v3> read aig ../hwmcc/6s282b01.aig
+
+v3> satv pdr -o 0
+
+Monitor "13959" is safe.
+runTime:5.5613
+
+v3> q -f
+
+--------------------------
+[11] current File = 6s289rb00529.aig
+v3> read aig ../hwmcc/6s289rb00529.aig
+
+v3> satv pdr -o 0
+--------------------------
+[12] current File = 6s289rb05233.aig
+v3> read aig ../hwmcc/6s289rb05233.aig
+
+v3> satv pdr -o 0
+--------------------------
+[13] current File = 6s291rb18.aig
+v3> read aig ../hwmcc/6s291rb18.aig
+
+v3> satv pdr -o 0
+--------------------------
+[14] current File = 6s291rb77.aig
+v3> read aig ../hwmcc/6s291rb77.aig
+
+v3> satv pdr -o 0
+--------------------------
+[15] current File = 6s317b14.aig
+v3> read aig ../hwmcc/6s317b14.aig
+
+v3> satv pdr -o 0
+
+Monitor "4976" is safe.
+runTime:49.347
+
+v3> q -f
+
+--------------------------
+[16] current File = 6s317b18.aig
+v3> read aig ../hwmcc/6s317b18.aig
+
+v3> satv pdr -o 0
+Recycling @timeFrame = 11
+
+Monitor "4984" is safe.
+runTime:190.313
+
+v3> q -f
+
+--------------------------
+[17] current File = 6s318r.aig
+v3> read aig ../hwmcc/6s318r.aig
+
+v3> satv pdr -o 0
+[OAO] print cex is disabled now, uncomment pdrMgr.cpp:10 to enable this feature.
+
+Monitor "3529" is violated.
+runTime:35.8396
+
+v3> q -f
+
+--------------------------
+[18] current File = 6s322rb265.aig
+v3> read aig ../hwmcc/6s322rb265.aig
+
+v3> satv pdr -o 0
+
+Monitor "~v3_Internal_Net_738616" is safe.
+runTime:0.957211
+
+v3> q -f
+
+--------------------------
+[19] current File = 6s325rb072.aig
+v3> read aig ../hwmcc/6s325rb072.aig
+
+v3> satv pdr -o 0
+--------------------------
+[20] current File = 6s327rb10.aig
+v3> read aig ../hwmcc/6s327rb10.aig
+
+v3> satv pdr -o 0
+--------------------------
+[21] current File = 6s327rb19.aig
+v3> read aig ../hwmcc/6s327rb19.aig
+
+v3> satv pdr -o 0
+
+Monitor "~v3_Internal_Net_31977" is safe.
+runTime:0.041247
+
+v3> q -f
+
+--------------------------
+[22] current File = 6s330rb06.aig
+v3> read aig ../hwmcc/6s330rb06.aig
+
+v3> satv pdr -o 0
+[OAO] print cex is disabled now, uncomment pdrMgr.cpp:10 to enable this feature.
+
+Monitor "4982" is violated.
+runTime:753.7
+
+v3> q -f
+
+--------------------------
+[23] current File = 6s330rb11.aig
+v3> read aig ../hwmcc/6s330rb11.aig
+
+v3> satv pdr -o 0
+
+Monitor "118479" is safe.
+runTime:114.732
+
+v3> q -f
+
+--------------------------
+[24] current File = 6s335rb09.aig
+v3> read aig ../hwmcc/6s335rb09.aig
+
+v3> satv pdr -o 0
+Recycling @timeFrame = 4
+Recycling @timeFrame = 5
+Recycling @timeFrame = 6
+[OAO] print cex is disabled now, uncomment pdrMgr.cpp:10 to enable this feature.
+
+Monitor "11900" is violated.
+runTime:501.477
+
+v3> q -f
+
+--------------------------
+[25] current File = 6s335rb60.aig
+v3> read aig ../hwmcc/6s335rb60.aig
+
+v3> satv pdr -o 0
+Recycling @timeFrame = 4
+Recycling @timeFrame = 5
+[OAO] print cex is disabled now, uncomment pdrMgr.cpp:10 to enable this feature.
+
+Monitor "12583" is violated.
+runTime:552.777
+
+v3> q -f
+
+--------------------------
+[26] current File = 6s344rb054.aig
+v3> read aig ../hwmcc/6s344rb054.aig
+
+v3> satv pdr -o 0
+
+Monitor "~v3_Internal_Net_97951" is safe.
+runTime:0.114136
+
+v3> q -f
+
+--------------------------
+[27] current File = 6s362rb1.aig
+v3> read aig ../hwmcc/6s362rb1.aig
+
+v3> satv pdr -o 0
+
+Monitor "9831" is safe.
+runTime:4.39226
+
+v3> q -f
+
+--------------------------
+[28] current File = 6s372rb26.aig
+v3> read aig ../hwmcc/6s372rb26.aig
+
+v3> satv pdr -o 0
+--------------------------
+[29] current File = 6s380b129.aig
+v3> read aig ../hwmcc/6s380b129.aig
+
+v3> satv pdr -o 0
+--------------------------
+[30] current File = 6s381rb630.aig
+v3> read aig ../hwmcc/6s381rb630.aig
+
+v3> satv pdr -o 0
+--------------------------
+[31] current File = 6s384rb024.aig
+v3> read aig ../hwmcc/6s384rb024.aig
+
+v3> satv pdr -o 0
+--------------------------
+[32] current File = 6s388b07.aig
+v3> read aig ../hwmcc/6s388b07.aig
+
+v3> satv pdr -o 0
+[OAO] print cex is disabled now, uncomment pdrMgr.cpp:10 to enable this feature.
+
+Monitor "34349" is violated.
+runTime:0.036398
+
+v3> q -f
+
+--------------------------
+[33] current File = 6s388b09.aig
+v3> read aig ../hwmcc/6s388b09.aig
+
+v3> satv pdr -o 0
+[OAO] print cex is disabled now, uncomment pdrMgr.cpp:10 to enable this feature.
+
+Monitor "34379" is violated.
+runTime:0.03648
+
+v3> q -f
+
+--------------------------
+[34] current File = 6s389b02.aig
+v3> read aig ../hwmcc/6s389b02.aig
+
+v3> satv pdr -o 0
+[OAO] print cex is disabled now, uncomment pdrMgr.cpp:10 to enable this feature.
+
+Monitor "34364" is violated.
+runTime:0.03697
+
+v3> q -f
+
+--------------------------
+[35] current File = 6s389b11.aig
+v3> read aig ../hwmcc/6s389b11.aig
+
+v3> satv pdr -o 0
+--------------------------
+[36] current File = 6s391rb379.aig
+v3> read aig ../hwmcc/6s391rb379.aig
+
+v3> satv pdr -o 0
+
+Monitor "~v3_Internal_Net_16806" is safe.
+runTime:0.052231
+
+v3> q -f
+
+--------------------------
+[37] current File = 6s400rb07819.aig
+v3> read aig ../hwmcc/6s400rb07819.aig
+
+v3> satv pdr -o 0
+
+Monitor "~v3_Internal_Net_141021" is safe.
+runTime:0.098612
+
+v3> q -f
+
+--------------------------
+[38] current File = 6s406rb067.aig
+v3> read aig ../hwmcc/6s406rb067.aig
+
+v3> satv pdr -o 0
+--------------------------
+[39] current File = 6s421rb050.aig
+v3> read aig ../hwmcc/6s421rb050.aig
+
+v3> satv pdr -o 0
+--------------------------
+[40] current File = 6s421rb083.aig
+v3> read aig ../hwmcc/6s421rb083.aig
+
+v3> satv pdr -o 0
+--------------------------
+[41] current File = 6s515rb1.aig
+v3> read aig ../hwmcc/6s515rb1.aig
+
+v3> satv pdr -o 0
+
+Monitor "3866" is safe.
+runTime:11.5812
+
+v3> q -f
+
+--------------------------
+[42] current File = oski1rub05.aig
+v3> read aig ../hwmcc/oski1rub05.aig
+
+v3> satv pdr -o 0
+
+Monitor "215114" is safe.
+runTime:0.171349
+
+v3> q -f
+
+--------------------------
+[43] current File = oski1rub05i.aig
+v3> read aig ../hwmcc/oski1rub05i.aig
+
+v3> satv pdr -o 0
+
+Monitor "0" is safe.
+runTime:0.133662
+
+v3> q -f
+
+--------------------------
+[44] current File = oski1rub06.aig
+v3> read aig ../hwmcc/oski1rub06.aig
+
+v3> satv pdr -o 0
+
+Monitor "215115" is safe.
+runTime:0.172133
+
+v3> q -f
+
+--------------------------
+[45] current File = oski3ub2i.aig
+v3> read aig ../hwmcc/oski3ub2i.aig
+
+v3> satv pdr -o 0
+
+Monitor "42777" is safe.
+runTime:8.34115
+
+v3> q -f
+
+--------------------------
+all testCase done!

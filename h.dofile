@@ -1,4 +1,0 @@
-read rtl a.v
-blast ntk
-satv pdr -o 0
-q -f
